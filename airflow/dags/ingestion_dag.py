@@ -24,7 +24,7 @@ with DAG(
         # Estos paquetes son OBLIGATORIOS para conectar Spark con S3/MinIO
         packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262',
         env_vars={
-            'MINIO_ACCESS_KEY': 'minioadmin', # O tus credenciales reales
+            'MINIO_ACCESS_KEY': 'admin', # O tus credenciales reales
             'MINIO_SECRET_KEY': 'minioadmin'
         },
         verbose=True
