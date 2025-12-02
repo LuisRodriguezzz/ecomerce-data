@@ -19,7 +19,8 @@ with DAG(
     # Tarea: Ejecutar el script de ingestión en el clúster de Spark
     ingest_task = SparkSubmitOperator(
         task_id='ingest_raw_data',
-        application='/opt/repo_code/spark/jobs/ingest_raw.py', # Ruta dentro del contenedor
+        # Usamos /git/repo que es donde git-sync descarga tus archivos en Airflow
+        application='/git/repo/spark/jobs/ingest_raw.py',   
         conn_id='spark_default', # Definiremos esto abajo
         # Estos paquetes son OBLIGATORIOS para conectar Spark con S3/MinIO
         packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262',
