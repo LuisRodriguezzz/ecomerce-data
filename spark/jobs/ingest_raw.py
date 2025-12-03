@@ -41,7 +41,7 @@ def ingest_data():
 
     # 2. Definir ruta en MinIO (Bucket 'raw-data' que creó el minio-init)
     # Usamos formato 'parquet' que es más eficiente
-    output_path = "s3a://myminio/raw-data/orders/"
+    output_path = "s3a://raw-data/orders/"
     
     # 3. Escribir datos (Mode 'append' para no borrar lo anterior)
     print(f"--- Escribiendo en {output_path} ---")
