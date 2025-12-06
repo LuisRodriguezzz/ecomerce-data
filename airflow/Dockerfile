@@ -1,19 +1,35 @@
-FROM apache/airflow:2.7.1
+FROM apache/airflow:2.7.1-python3.10
 
-# 1. Cambiar temporalmente al usuario ROOT para instalar dependencias del sistema.
 USER root
 
-# 2. Instalar dependencias del sistema operativo (apt-get)
-# Ahora, como root, tienes los permisos para manipular /var/lib/apt/lists
+# Instalamos Java y dependencias del sistema
 RUN apt-get update && \
-    apt-get install -y build-essential python3-dev libicu-dev && \
+    apt-get install -y \
+    build-essential \
+    python3-dev \
+    libicu-dev \
+    openjdk-17-jre-headless \
+    procps && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 3. Volver al usuario por defecto de Airflow (airflow)
-# Esto es CRUCIAL para mantener la seguridad y que Airflow pueda ejecutarse correctamente.
+# Configuramos JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
 USER airflow 
 
-# 4. Instalar las librerías de Python.
-# pip generalmente puede instalar librerías en el entorno virtual del usuario Airflow.
-RUN pip install --no-cache-dir pyspark pandas minio apache-airflow==2.7.1 apache-airflow-providers-apache-spark apache-airflow-providers-amazon
+# Actualizamos pip
+RUN pip install --upgrade pip
+
+# --- BLOQUE CORREGIDO ---
+# Instalamos TODO en una sola línea para que el resolver de dependencias funcione bien.
+# Fijamos pyspark==3.5.0 para que NO intente bajar la 4.0.1
+# Usamos timeout alto para que no falle tu internet.
+RUN pip install --no-cache-dir --default-timeout=1000 \
+    pyspark==3.5.0 \
+    pandas \
+    minio \
+    apache-airflow==2.7.1 \
+    apache-airflow-providers-apache-spark \
+    apache-airflow-providers-amazon \
+    kaggle
