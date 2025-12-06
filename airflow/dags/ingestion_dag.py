@@ -31,13 +31,17 @@ with DAG(
         application='/git/repo/spark/jobs/landing_to_bronze.py',
         conn_id='spark_default',
         deploy_mode='client',   
-        packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.1.0',
+        packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.0.0',
         # -------------------
         conf={
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
-            "spark.driver.memory": "512m"
-        },
+            "spark.driver.memory": "512m",
+            "spark.executor.memory": "2g",
+            "spark.driver.host": "airflow-scheduler",
+            "spark.driver.port": "7078",
+            "spark.blockManager.port": "7079"
+             },
         env_vars={
             'MINIO_ACCESS_KEY': 'admin',
             'MINIO_SECRET_KEY': 'minioadmin'
