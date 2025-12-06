@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.operators.bash import BashOperator # <--- Usamos este en vez de PythonOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
 
 default_args = {
@@ -24,4 +25,25 @@ with DAG(
         bash_command='python /git/repo/spark/jobs/ingest_kaggle.py'
     )
 
-    ingest_task
+    
+
+    to_bronze = SparkSubmitOperator(
+        task_id='process_landing_to_bronze',
+        application='/git/repo/spark/jobs/landing_to_bronze.py',
+        conn_id='spark_default',
+        # --- CAMBIO AQUÍ ---
+        # Agregamos io.delta:delta-spark_2.12:3.1.0 (Compatible con Spark 3.5)
+        packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.1.0',
+        # -------------------
+        conf={
+            "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
+            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        },
+        env_vars={
+            'MINIO_ACCESS_KEY': 'minioadmin',
+            'MINIO_SECRET_KEY': 'minioadmin'
+        },
+        verbose=True
+    )
+    
+    ingest_task >> to_bronze
