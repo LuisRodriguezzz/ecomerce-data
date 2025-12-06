@@ -7,7 +7,7 @@ from minio.error import S3Error
 # --- CONFIGURACIÓN ---
 MINIO_ENDPOINT = "minio:9000"
 # Usamos las mismas variables que ya tienes configuradas
-MINIO_ACCESS_KEY = os.getenv("MINIO_ROOT_USER", "minioadmin")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ROOT_USER", "admin")
 MINIO_SECRET_KEY = os.getenv("MINIO_ROOT_PASSWORD", "minioadmin")
 BUCKET_NAME = "raw-data"
 DATASET_NAME = "mkechinov/ecommerce-behavior-data-from-multi-category-store"
