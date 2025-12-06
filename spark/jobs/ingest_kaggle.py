@@ -10,7 +10,9 @@ MINIO_ENDPOINT = "minio:9000"
 MINIO_ACCESS_KEY = os.getenv("MINIO_ROOT_USER", "admin")
 MINIO_SECRET_KEY = os.getenv("MINIO_ROOT_PASSWORD", "minioadmin")
 BUCKET_NAME = "raw-data"
-DATASET_NAME = "mkechinov/ecommerce-behavior-data-from-multi-category-store"
+# Dataset de Olist: Completo, real, pero ligero (50MB)
+DATASET_NAME = "olistbr/brazilian-ecommerce"
+#DATASET_NAME = "mkechinov/ecommerce-events-history-in-cosmetics-shop"
 TEMP_DIR = "/tmp/kaggle_data"  # Directorio temporal en el contenedor
 
 def upload_to_minio_and_clean():
