@@ -24,19 +24,19 @@ with DAG(
         # Aquí pasas la ruta directa, igual que en SparkSubmitOperator
         bash_command='python /git/repo/spark/jobs/ingest_kaggle.py'
     )
-
     
 
     to_bronze = SparkSubmitOperator(
         task_id='process_landing_to_bronze',
         application='/git/repo/spark/jobs/landing_to_bronze.py',
         conn_id='spark_default',
-        deploy_mode='cluster',   
+        deploy_mode='client',   
         packages='org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.1.0',
         # -------------------
         conf={
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
-            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+            "spark.driver.memory": "512m"
         },
         env_vars={
             'MINIO_ACCESS_KEY': 'admin',
