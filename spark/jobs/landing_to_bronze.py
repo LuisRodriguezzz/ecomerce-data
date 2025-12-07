@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, input_file_name
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType, LongType, TimestampType
 import os
 
 def get_spark_session():
@@ -19,32 +20,49 @@ def get_spark_session():
 def process():
     spark = get_spark_session()
     
-    # Rutas
     input_path = "s3a://raw-data/landing/*.csv" 
-    # OJO: Ahora guardamos en una carpeta 'delta' para diferenciar
     output_path = "s3a://raw-data/bronze/cosmetics_events_delta/"
     
-    print(f"--- Leyendo CSVs desde {input_path} ---")
+    # --- DEFINICIÓN DE ESQUEMA (SCHEMA ENFORCEMENT) ---
+    # Esto es mucho más rápido y seguro que inferSchema
+    custom_schema = StructType([
+        StructField("event_time", StringType(), True),      # Leemos como String primero por seguridad
+        StructField("event_type", StringType(), True),
+        StructField("product_id", LongType(), True),        # IDs suelen ser números largos
+        StructField("category_id", LongType(), True),
+        StructField("category_code", StringType(), True),
+        StructField("brand", StringType(), True),
+        StructField("price", DoubleType(), True),           # Precio siempre Double
+        StructField("user_id", LongType(), True),
+        StructField("user_session", StringType(), True)
+    ])
+    
+    print(f"--- Leyendo CSVs con Esquema Estricto desde {input_path} ---")
     
     df = spark.read \
         .format("csv") \
         .option("header", "true") \
-        .option("inferSchema", "true") \
-        .load(input_path)
+        .schema(custom_schema) \
+        .load(input_path)  # <-- Aquí Spark ya sabe qué esperar, no adivina
     
+    print("--- Esquema Validado ---")
+    df.printSchema()
+    
+    # Transformaciones de Metadatos
     df_transformed = df \
         .withColumn("ingestion_date", current_timestamp()) \
         .withColumn("source_file", input_file_name())
 
-    print(f"--- Escribiendo DELTA TABLE en {output_path} ---")
+    print(f"--- Escribiendo DELTA en {output_path} ---")
     
-    # --- CAMBIO AQUÍ: format("delta") ---
+    # Guardamos en Bronze
     df_transformed.write \
         .format("delta") \
         .mode("overwrite") \
+        .option("overwriteSchema", "true") \
         .save(output_path)
     
-    print("--- Transformación a Delta Lake Finalizada ---")
+    print("--- Transformación Bronze Finalizada ---")
     spark.stop()
 
 if __name__ == "__main__":
