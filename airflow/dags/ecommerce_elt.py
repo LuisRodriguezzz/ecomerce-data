@@ -79,7 +79,7 @@ with DAG(
         # Usamos la misma config que ya sabemos que funciona (memoria + red)
         conf=spark_conf, 
         env_vars={
-            'MINIO_ACCESS_KEY': 'minioadmin',
+            'MINIO_ACCESS_KEY': 'admin',
             'MINIO_SECRET_KEY': 'minioadmin',
             'MINIO_ENDPOINT': 'http://minio:9000'
         },
