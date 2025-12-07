@@ -47,7 +47,7 @@ with DAG(
         packages=spark_packages,
         conf=spark_conf,
         env_vars={
-            'MINIO_ACCESS_KEY': 'minioadmin',
+            'MINIO_ACCESS_KEY': 'admin',
             'MINIO_SECRET_KEY': 'minioadmin',
             'MINIO_ENDPOINT': 'http://minio:9000'
         },
@@ -63,7 +63,7 @@ with DAG(
         packages=spark_packages,
         conf=spark_conf,
         env_vars={
-            'MINIO_ACCESS_KEY': 'minioadmin',
+            'MINIO_ACCESS_KEY': 'admin',
             'MINIO_SECRET_KEY': 'minioadmin',
             'MINIO_ENDPOINT': 'http://minio:9000'
         },
