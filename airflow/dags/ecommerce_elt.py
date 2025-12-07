@@ -70,6 +70,22 @@ with DAG(
         verbose=True
     )
 
+    gold_task = SparkSubmitOperator(
+        task_id='process_silver_to_gold',
+        application='/git/repo/spark/jobs/silver_to_gold.py',
+        conn_id='spark_default',
+        deploy_mode='client',
+        packages=spark_packages,
+        # Usamos la misma config que ya sabemos que funciona (memoria + red)
+        conf=spark_conf, 
+        env_vars={
+            'MINIO_ACCESS_KEY': 'minioadmin',
+            'MINIO_SECRET_KEY': 'minioadmin',
+            'MINIO_ENDPOINT': 'http://minio:9000'
+        },
+        verbose=True
+    )
+
     # --- DEFINICIÓN DE DEPENDENCIAS ---
     # Esto le dice a Airflow el orden exacto:
-    ingest_task >> bronze_task >> silver_task
+    ingest_task >> bronze_task >> silver_task >> gold_task
