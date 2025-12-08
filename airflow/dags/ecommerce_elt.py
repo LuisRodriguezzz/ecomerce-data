@@ -12,7 +12,8 @@ spark_conf = {
     "spark.driver.port": "7078",
     "spark.blockManager.port": "7079",
     "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
-    "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+    "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+    "spark.master": "spark://spark-master:7077"
 }
 
 # Paquetes necesarios (Delta 3.0.0 para Spark 3.5)
