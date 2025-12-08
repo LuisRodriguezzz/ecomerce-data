@@ -17,6 +17,8 @@ spark_conf = {
 
 # Paquetes necesarios (Delta 3.0.0 para Spark 3.5)
 spark_packages = 'org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.0.0'
+# Agregamos el driver de postgres al final
+spark_packages = 'org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262,io.delta:delta-spark_2.12:3.0.0,org.postgresql:postgresql:42.6.0'
 
 default_args = {
     'owner': 'airflow',
@@ -86,6 +88,22 @@ with DAG(
         verbose=True
     )
 
+    # 5. PUBLISH: Mover Gold a Postgres (Serving Layer)
+    publish_task = SparkSubmitOperator(
+        task_id='publish_gold_to_postgres',
+        application='/git/repo/spark/jobs/gold_to_service_layer.py',
+        conn_id='spark_default',
+        deploy_mode='client',
+        packages=spark_packages,
+        conf=spark_conf,
+        env_vars={
+            'MINIO_ACCESS_KEY': 'admin',    
+            'MINIO_SECRET_KEY': 'minioadmin',
+            'MINIO_ENDPOINT': 'http://minio:9000'
+        },
+        verbose=True
+    )
+
     # --- DEFINICIÓN DE DEPENDENCIAS ---
     # Esto le dice a Airflow el orden exacto:
-    ingest_task >> bronze_task >> silver_task >> gold_task
+    ingest_task >> bronze_task >> silver_task >> gold_task >> publish_task
